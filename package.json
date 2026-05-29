@@ -1,0 +1,17 @@
+{
+  "name": "natours-app",
+  "version": "1.0.0",
+  "description": "Natours application",
+  "license": "ISC",
+  "author": "Shyam C B",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.3"
+  }
+}
