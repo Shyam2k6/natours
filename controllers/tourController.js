@@ -1,4 +1,5 @@
 const express = require('express');
+const Tour = require('../models/tourModel');
 
 exports.getAllTours = (req, res) => {
   res.send({
@@ -7,11 +8,19 @@ exports.getAllTours = (req, res) => {
   });
 };
 
-exports.createTour = (req, res) => {
-  res.status(201).send({
-    status: 'success',
-    message: 'Create Tour',
-  });
+exports.createTour = async (req, res) => {
+  try {
+    const newTour = await Tour.create(req.body);
+    res.status(201).send({
+      status: 'success',
+      data: newTour,
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
 exports.updateTour = (req, res) => {
