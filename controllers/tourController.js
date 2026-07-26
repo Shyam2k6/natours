@@ -20,10 +20,33 @@ exports.getAllTours = async (req, res) => {
       console.log(sortBy);
       query = query.sort(sortBy);
     } else {
-      query = query.sort('-createdAt');
+      query = query.sort('_id');
+    }
+
+    //LIMITING FIELDS
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
+
+    //PAGINATION
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 10;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) {
+        throw new Error("This page doesn't exist");
+      }
     }
 
     const tours = await query;
+
     res.status(200).json({
       status: 'success',
       results: tours.length,
@@ -34,7 +57,7 @@ exports.getAllTours = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: err,
+      message: err.message,
     });
   }
 };
