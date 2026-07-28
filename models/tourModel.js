@@ -8,6 +8,7 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'Name is required'],
       unique: true,
       trim: true,
+      maxLength: [20, 'Tour name should be less or equal to 20 characters'],
     },
     slug: String,
     secretTour: {
@@ -29,6 +30,8 @@ const tourSchema = new mongoose.Schema(
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      min: [1, 'A rating must be greater or equal to 1'],
+      max: [5, 'A rating must be lesser or equal to 5'],
     },
     ratingsQuantity: {
       type: Number,
@@ -38,7 +41,15 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Price is required'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          return val < this.price;
+        },
+        message: 'Discount price ({VALUE}) should be below actual price',
+      },
+    },
     summary: {
       type: String,
       trim: true,
@@ -84,6 +95,10 @@ tourSchema.pre(/^find/, function (next) {
 tourSchema.post(/^find/, function (doc, next) {
   console.log(`Your query took ${Date.now() - this.start} ms!`);
   next();
+});
+
+tourSchema.pre('aggregate', function () {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
