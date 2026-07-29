@@ -1,6 +1,7 @@
 const express = require('express');
 const Tour = require('../models/tourModel');
 const asyncHandler = require('../utils/asyncHandler');
+const AppError = require('../utils/appError');
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -63,15 +64,13 @@ exports.getAllTours = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getTour = asyncHandler(async (req, res) => {
+exports.getTour = asyncHandler(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
 
   if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: `No tour found with id ${req.params.id}`,
-    });
+    return next(new AppError('No tour found with the ID', 404));
   }
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -90,11 +89,16 @@ exports.createTour = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateTour = asyncHandler(async (req, res) => {
+exports.updateTour = asyncHandler(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
+
+  if (!tour) {
+    return next(new AppError('No tour found with the ID', 404));
+  }
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -103,8 +107,13 @@ exports.updateTour = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteTour = asyncHandler(async (req, res) => {
-  await Tour.findByIdAndDelete(req.params.id);
+exports.deleteTour = asyncHandler(async (req, res, next) => {
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+
+  if (!tour) {
+    return next(new AppError('No tour found with the ID', 404));
+  }
+
   res.status(204).json({
     status: 'success',
     message: null,

@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const tourRouter = require('./routes/tourRouter');
 const AppError = require('./utils/appError');
-const errorMiddleware = require('./controllers/errorMiddleware');
+const errorMiddleware = require('./controllers/errorController');
 
 app.set('query parser', 'extended');
 app.use(express.json());
