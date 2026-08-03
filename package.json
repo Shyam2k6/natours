@@ -10,9 +10,11 @@
     "start": "nodemon server.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "express": "^4.22.2",
     "mongoose": "^9.6.3",
-    "slugify": "^1.6.9"
+    "slugify": "^1.6.9",
+    "validator": "^13.15.35"
   }
 }
